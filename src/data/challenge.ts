@@ -1232,12 +1232,42 @@ export class PassivesChallenge extends Challenge {
   }
 }
 
+//! temporary, used for bug fixing; rebase out the commit adding this before merging the bug fix PR
+export class ExampleChallenge extends Challenge {
+  constructor() {
+    super(Challenges.EXAMPLE, 1);
+  }
+
+  override getName(): string {
+    return "Example Challenge";
+  }
+
+  override getValue(): string {
+    if (this.value === 1) {
+      return "On";
+    }
+    return "Off";
+  }
+
+  override getDescription(): string {
+    return "This entry exists to demonstrate bug(s) with the challenges UI and will be removed once they are fixed. Enabling this has no effect (but don't do it, things will break when it's removed).";
+  }
+
+  static override loadChallenge(source: ExampleChallenge | any): ExampleChallenge {
+    const newChallenge = new ExampleChallenge();
+    newChallenge.value = source.value;
+    newChallenge.severity = source.severity;
+    return newChallenge;
+  }
+}
+
 /**
  * @param source - A challenge to copy, or an object of a challenge's properties. Missing values are treated as defaults.
  * @returns The challenge in question.
  */
 export function copyChallenge(source: Challenge | any): Challenge {
-  switch (source.id) {
+  const challengeId = source.id as Challenges;
+  switch (challengeId) {
     case Challenges.SINGLE_GENERATION:
       return SingleGenerationChallenge.loadChallenge(source);
     case Challenges.SINGLE_TYPE:
@@ -1260,8 +1290,12 @@ export function copyChallenge(source: Challenge | any): Challenge {
       return HardcoreChallenge.loadChallenge(source);
     case Challenges.PASSIVES:
       return PassivesChallenge.loadChallenge(source);
+    case Challenges.EXAMPLE:
+      return ExampleChallenge.loadChallenge(source);
+    default:
+      challengeId satisfies never;
+      throw new Error("Unknown challenge copied");
   }
-  throw new Error("Unknown challenge copied");
 }
 
 export const allChallenges: Challenge[] = [];
@@ -1277,5 +1311,6 @@ export function initChallenges() {
     new PassivesChallenge(),
     new InverseBattleChallenge(),
     new FlipStatChallenge(),
+    new ExampleChallenge(),
   );
 }
