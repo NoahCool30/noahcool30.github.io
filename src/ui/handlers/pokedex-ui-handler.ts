@@ -1573,7 +1573,8 @@ export class PokedexUiHandler extends MessageUiHandler {
         .some(type => species.isOfType((type as number) - 1));
 
       // Biome filter
-      const indexToBiome = new Map(Object.keys(BiomeId).map((key, idx) => [idx, key]));
+      // TODO: This is type unsafe and really should not be hardcoding strings here
+      const indexToBiome = new Map<number, string>(Object.keys(BiomeId).map((key, idx) => [idx, key]));
       indexToBiome.set(35, "Uncatchable");
 
       // We get biomes for both the mon and its starters to ensure that evolutions get the correct filters.
@@ -2371,12 +2372,13 @@ export class PokedexUiHandler extends MessageUiHandler {
     }
   }
 
+  // TODO: Dedupe from SSUI
   updateStarterValueLabel(starter: PokedexMonContainer): void {
     const speciesId = starter.species.speciesId;
     const baseStarterValue = speciesStarterCosts[speciesId];
     const starterValue = this.gameData.getSpeciesStarterValue(this.getStarterSpeciesId(speciesId));
     starter.cost = starterValue;
-    let valueStr = starterValue.toString();
+    let valueStr: string = starterValue.toString();
     if (valueStr.startsWith("0.")) {
       valueStr = valueStr.slice(1);
     }
